@@ -1,19 +1,17 @@
 package com.example.biblio.payload;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-
-import javax.persistence.Column;
+import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ApiResponse {
 
-    @Column(name = "success", nullable = false)
-    private Boolean success;
-
-    @Column(name = "message", nullable = false)
-    private String message;
+    Boolean success;
+    String message;
 
     public ApiResponse(Boolean success, String message) {
         this.success = success;

@@ -1,53 +1,39 @@
 package com.example.biblio.service;
 
-import com.example.biblio.model.Role;
+import com.example.biblio.exception.UserNotFoundException;
 import com.example.biblio.model.User;
-import com.example.biblio.payload.SignUpRequest;
 import com.example.biblio.repository.UserRepository;
-import lombok.Data;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import java.util.List;
 
-import java.net.URI;
-import java.util.Collections;
-
-@Data
 @Service
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class UserService {
 
-    private UserRepository userRepository;
-    private PasswordEncoder passwordEncoder;
+    UserRepository userRepository;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
-    public Boolean existsByUsername(String username){
-        return userRepository.existsByUsername(username);
+    @Transactional(readOnly = true)
+    public List<User> findAllUser() {
+        return userRepository.findAll();
     }
-    public Boolean existsByEmail(String email){
-        return userRepository.existsByEmail(email);
+
+    @Transactional(readOnly = true)
+    public User findUserById(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
     }
 
     @Transactional
-    public URI registerUser(SignUpRequest signUpRequest){
-        User user = new User();
-        user.setName(signUpRequest.getName());
-        user.setUsername(signUpRequest.getUsername());
-        user.setEmail(signUpRequest.getEmail());
-        user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
-        user.setRoles(Collections.singletonList(Role.ROLE_USER));
-
-        User newUser = userRepository.save(user);
-
-        return ServletUriComponentsBuilder
-                .fromCurrentContextPath().path("/users/{username}")
-                .buildAndExpand(newUser.getUsername()).toUri();
+    public void delete(Long id) {
+        userRepository.deleteById(id);
     }
 
 }

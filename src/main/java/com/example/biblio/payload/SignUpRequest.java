@@ -1,34 +1,32 @@
 package com.example.biblio.payload;
 
+import com.example.biblio.validation.ValidPassword;
+import lombok.AccessLevel;
 import lombok.Data;
-
-import javax.persistence.Column;
+import lombok.experimental.FieldDefaults;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @Data
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class SignUpRequest {
 
     @NotBlank
     @Size(min = 2, max = 40)
-    @Column(name = "name")
-    private String name;
+    String name;
 
     @NotBlank
     @Size(min = 2, max = 15)
-    @Column(name = "username")
-    private String username;
+    String username;
 
     @NotBlank
     @Size(max = 40)
-    @Column(name = "email")
     @Email
-    private String email;
+    String email;
 
     @NotBlank
-    @Size(min = 4, max = 20)
-    @Column(name = "password")
-    private String password;
+    @ValidPassword
+    String password;
 
 }

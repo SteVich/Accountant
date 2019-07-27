@@ -1,22 +1,24 @@
 package com.example.biblio.payload;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.FieldDefaults;
 
-import javax.persistence.Column;
+import static com.example.biblio.util.JwtProperties.TOKEN_TYPE;
 
 @Getter
 @Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class JwtAuthenticationResponse {
 
-    @Column(name = "accessToken")
-    private String accessToken;
+    String accessToken;
+    String refreshToken;
+    String tokenType = TOKEN_TYPE;
 
-    @Column(name = "tokenType")
-    private String tokenType = "Bearer";
-
-    public JwtAuthenticationResponse(String accessToken) {
+    public JwtAuthenticationResponse(String accessToken, String refreshToken) {
         this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
     }
 
 }

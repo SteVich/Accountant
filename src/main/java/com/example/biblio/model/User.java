@@ -1,54 +1,68 @@
 package com.example.biblio.model;
 
-import lombok.AllArgsConstructor;
+import com.example.biblio.model.token.RefreshToken;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.vladmihalcea.hibernate.type.json.JsonNodeBinaryType;
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Size;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @Data
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "users", uniqueConstraints = {
         @UniqueConstraint(columnNames = {
                 "username", "email"
         })})
+@TypeDef(
+        name = "jsonb-node",
+        typeClass = JsonNodeBinaryType.class
+)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    Long id;
 
     @Column(name = "name", nullable = false, length = 40)
-    private String name;
+    String name;
 
     @Size(min = 4, max = 60, message = "Minimum username length: 4 characters")
     @Column(name = "username", nullable = false)
-    private String username;
+    String username;
 
     @Email
     @Column(name = "email", nullable = false, length = 100)
-    private String email;
+    String email;
 
-    @Size(min = 4, message = "Minimum password length: 4 characters")
-    @Column(name = "password", nullable = false, length = 100)
-    private String password;
+    @Column(name = "password", nullable = false)
+    String password;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Column(name = "roles", nullable = false)
-    List<Role> roles;
+    @Type( type = "jsonb-node" )
+    @Column(columnDefinition = "jsonb")
+    JsonNode role;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY, optional = false)
+    @JsonIgnore
+    RefreshToken refreshToken;
+
 }
 
