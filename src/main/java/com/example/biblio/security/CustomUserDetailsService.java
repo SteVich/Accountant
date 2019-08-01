@@ -4,7 +4,7 @@ import com.example.biblio.exception.UserNotFoundException;
 import com.example.biblio.model.User;
 import com.example.biblio.repository.UserRepository;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,8 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
-@AllArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
     UserRepository userRepository;
@@ -22,7 +22,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String usernameOrEmail) {
         User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
-                .orElseThrow(() -> new UserNotFoundException(usernameOrEmail));
+                .orElseThrow(() -> new UserNotFoundException("User not found with username or email with : " + usernameOrEmail));
 
         return UserPrincipal.create(user);
     }
@@ -30,7 +30,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Transactional(readOnly = true)
     public UserDetails loadUserById(Long id) throws UserNotFoundException {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+                .orElseThrow(() -> new UserNotFoundException("User not found with id with : " + id));
 
         return UserPrincipal.create(user);
     }

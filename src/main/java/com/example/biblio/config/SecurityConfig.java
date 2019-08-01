@@ -2,6 +2,8 @@ package com.example.biblio.config;
 
 import com.example.biblio.security.CustomUserDetailsService;
 import com.example.biblio.security.JwtAuthenticationEntryPoint;
+import com.example.biblio.security.JwtAuthenticationFilter;
+import com.example.biblio.security.JwtTokenProvider;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -16,6 +18,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -31,13 +34,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     CustomUserDetailsService customUserDetailsService;
     JwtAuthenticationEntryPoint unauthorizedHandler;
-    WebConfig webConfig;
+    JwtTokenProvider tokenProvider;
+    PasswordEncoder passwordEncoder;
 
     @Override
     public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
         authenticationManagerBuilder
                 .userDetailsService(customUserDetailsService)
-                .passwordEncoder(webConfig.passwordEncoder());
+                .passwordEncoder(passwordEncoder);
     }
 
     @Bean(BeanIds.AUTHENTICATION_MANAGER)
@@ -69,7 +73,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest()
                 .authenticated();
 
-        http.addFilterBefore(webConfig.jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new JwtAuthenticationFilter(tokenProvider, customUserDetailsService), UsernamePasswordAuthenticationFilter.class);
     }
 
 }

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @Getter
 @Setter
@@ -12,9 +13,11 @@ import javax.validation.constraints.NotBlank;
 public class LoginRequest {
 
     @NotBlank
+    @Size(min = 4, max = 50)
     String usernameOrEmail;
 
     @NotBlank
+    @Size(min = 4, max = 30)
     String password;
 
 }

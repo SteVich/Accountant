@@ -1,15 +1,15 @@
 package com.example.biblio.payload;
 
 import lombok.AccessLevel;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import javax.validation.constraints.NotBlank;
 
-@Data
+@Getter
+@NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TokenRefreshRequest {
+public class TokenRequest {
 
-    @NotBlank(message = "Refresh token cannot be blank")
     String refreshToken;
 
 }

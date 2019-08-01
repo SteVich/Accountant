@@ -1,11 +1,11 @@
 package com.example.biblio.payload;
 
-import com.example.biblio.validation.ValidPassword;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 @Data
@@ -26,7 +26,7 @@ public class SignUpRequest {
     String email;
 
     @NotBlank
-    @ValidPassword
+    @Pattern(regexp = "((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#!_$%]).{4,30})")
     String password;
 
 }

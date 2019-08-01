@@ -1,9 +1,9 @@
 package com.example.biblio.security;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,22 +17,23 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Log4j2
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    @Autowired
     JwtTokenProvider tokenProvider;
 
-    @Autowired
     CustomUserDetailsService customUserDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
-            String jwt = getJwtFromRequest(request);
+            String accessToken = getAccessTokenFromRequest(request);
+            String refreshToken = getRefreshTokenFromRequest(request);
 
-            if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
-                Long userId = tokenProvider.getUserIdFromJWT(jwt);
+            if (StringUtils.hasText(accessToken) && tokenProvider.validateToken(accessToken)
+                    && tokenProvider.checkExpirationAccessToken(refreshToken)) {
+                Long userId = tokenProvider.getUserIdFromJWT(accessToken);
 
                 UserDetails userDetails = customUserDetailsService.loadUserById(userId);
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
@@ -47,11 +48,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private String getJwtFromRequest(HttpServletRequest request) {
+    private String getAccessTokenFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
-
         return (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer "))
                     ? bearerToken.substring(7, bearerToken.length()) : null;
+    }
+
+    private String getRefreshTokenFromRequest(HttpServletRequest request) {
+        return  request.getHeader("RefreshToken");
     }
 
 }

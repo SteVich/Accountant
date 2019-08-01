@@ -23,4 +23,10 @@ public class RestExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
+    @ExceptionHandler(value = {InvalidTokenException.class})
+    public ResponseEntity InvalidTokenException(InvalidTokenException ex, WebRequest request) {
+        log.debug("handling InvalidTokenException...");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
+
 }

@@ -1,69 +1,52 @@
 package com.example.biblio.service;
 
-import com.example.biblio.exception.UserNotFoundException;
+import com.example.biblio.model.Role;
 import com.example.biblio.model.User;
-import com.example.biblio.model.token.RefreshToken;
 import com.example.biblio.payload.JwtAuthenticationResponse;
 import com.example.biblio.payload.SignUpRequest;
-import com.example.biblio.payload.TokenRefreshRequest;
+import com.example.biblio.payload.TokenRequest;
 import com.example.biblio.repository.UserRepository;
 import com.example.biblio.security.JwtTokenProvider;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
+import com.example.biblio.util.JwtProperties;
 import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import java.io.IOException;
 import java.net.URI;
+import java.util.Collections;
 
 @Service
+@RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class AuthService {
 
     UserRepository userRepository;
     PasswordEncoder passwordEncoder;
     JwtTokenProvider tokenProvider;
-    RefreshTokenService refreshTokenService;
-
-    @Autowired
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtTokenProvider tokenProvider, RefreshTokenService refreshTokenService) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.tokenProvider = tokenProvider;
-        this.refreshTokenService = refreshTokenService;
-    }
+    JwtProperties properties;
 
     @Transactional(readOnly = true)
     public Boolean existsByUsername(SignUpRequest user) {
-        if (userRepository.existsByUsername(user.getUsername())) {
-            return false;
-        } else return true;
+        return  userRepository.existsByUsername(user.getUsername()) ? false : true;
     }
 
     @Transactional(readOnly = true)
     public Boolean existsByEmail(SignUpRequest user) {
-        if (userRepository.existsByEmail(user.getEmail())) {
-            return false;
-        } else return true;
+        return  userRepository.existsByEmail(user.getEmail()) ? false : true;
     }
 
     @Transactional
-    public URI registerUser(SignUpRequest signUpRequest) throws IOException {
+    public URI registerUser(SignUpRequest signUpRequest) {
         User user = new User();
         user.setName(signUpRequest.getName());
         user.setUsername(signUpRequest.getUsername());
         user.setEmail(signUpRequest.getEmail());
         user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
-
-        JsonNode role = JacksonUtil.toJsonNode("{" +
-                "\"name\": \"ROLE_USER\"" +
-                "}");
-        user.setRole(role);
+        user.setRoles(Collections.singleton(Role.ROLE_USER));
 
         User newUser = userRepository.save(user);
 
@@ -73,41 +56,20 @@ public class AuthService {
     }
 
     public String createAccessToken(Authentication authentication) {
-        return tokenProvider.generateToken(authentication);
+        return tokenProvider.generateToken(authentication, properties.getExpirationAccessToken());
     }
 
-    @Transactional
-    public String createRefreshToken(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
-
-        RefreshToken refreshToken = refreshTokenService.create(user);
-
-        user.setRefreshToken(refreshToken);
-
-        refreshToken.setUser(user);
-        refreshTokenService.save(refreshToken);
-
-        return refreshToken.getToken();
+    public String createRefreshToken(Authentication authentication) {
+        return tokenProvider.generateToken(authentication, properties.getExpirationRefreshToken());
     }
 
-    @Transactional
-    public JwtAuthenticationResponse refreshJwtToken(TokenRefreshRequest tokenRefreshRequest) {
-        String token = tokenRefreshRequest.getRefreshToken();
+    public JwtAuthenticationResponse generateNewTokens(TokenRequest tokenRequest) {
+        Long userId = tokenProvider.getUserIdFromJWT(tokenRequest.getRefreshToken());
 
-        RefreshToken refreshToken = refreshTokenService.find(token);
+        String newAccessToken = tokenProvider.generateTokenFromId(userId, properties.getExpirationAccessToken());
+        String newRefreshToken = tokenProvider.generateTokenFromId(userId, properties.getExpirationRefreshToken());
 
-        User user = refreshToken.getUser();
-        refreshTokenService.verifyExpiration(refreshToken);
-
-        String accessToken = tokenProvider.generateTokenFromId(user.getId());
-
-        RefreshToken newRefreshToken = refreshTokenService.create(user);
-        user.setRefreshToken(newRefreshToken);
-
-        newRefreshToken.setUser(user);
-        refreshTokenService.save(newRefreshToken);
-
-        return new JwtAuthenticationResponse(accessToken, newRefreshToken.getToken());
+        return new JwtAuthenticationResponse(newAccessToken, newRefreshToken);
     }
 
 }

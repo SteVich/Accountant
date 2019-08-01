@@ -1,10 +1,27 @@
 package com.example.biblio.util;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+@Getter
+@Setter
+@ConfigurationProperties(prefix = "jwt")
 public class JwtProperties {
 
-    public static final long JWT_EXPIRATION_MS = 3600000;
-    public static final String JWT_SECRET = "SeCreTKey";
-    public static final long REFRESH_TOKEN_EXPIRATION = 30 * 24 * 60 * 60;
-    public static final String TOKEN_TYPE = "Bearer";
+    /**
+     * Use this variable for set expiration time of access token
+     */
+    Long expirationAccessToken;
+
+    /**
+     * Use this variable for set expiration time of refresh token
+     */
+    Long expirationRefreshToken;
+
+    /**
+     * Use this variable for set key that allow to validate the JWT
+     */
+    String secretKey;
 
 }
