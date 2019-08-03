@@ -10,8 +10,8 @@ public interface UserMapper {
 
     UserDTO toUserDTO(User user);
 
-    List<UserDTO> toUserDTOs(List<User> products);
+    List<UserDTO> toUserDTOs(List<User> users);
 
-    User toUser(User userDto);
+    User toUser(UserDTO userDTO);
 
 }

@@ -1,11 +1,13 @@
 package com.example.biblio.dto;
 
 import com.example.biblio.model.Role;
+import com.example.biblio.payload.modelRequest.BookRequest;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -26,5 +28,7 @@ public class UserDTO {
 
     @NotNull
     Set<Role> roles;
+
+    List<BookRequest> books;
 
 }

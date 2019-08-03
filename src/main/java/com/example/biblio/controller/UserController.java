@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,15 +30,16 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> getUserById(@PathVariable("id") Long id) {
+    public ResponseEntity<UserDTO> getUserByUserId(@PathVariable("id") Long id) {
         return ResponseEntity.ok(userMapper.toUserDTO(userService.findUserById(id)));
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity deleteUser(@PathVariable("id") Long id) {
-        userService.delete(id);
+        userService.deleteUser(id);
 
-        return (ResponseEntity) ResponseEntity.noContent();
+        return ResponseEntity.noContent().build();
     }
 
 }
