@@ -20,6 +20,10 @@ public class UserService {
     UserRepository userRepository;
     BorrowedRepository borrowedRepository;
 
+
+    UserRepository userRepository;
+    BorrowedRepository borrowedRepository;
+
     @Transactional(readOnly = true)
     public List<User> findAllUser() {
         return userRepository.findAll();
@@ -40,7 +44,6 @@ public class UserService {
     public List<Borrowed> findAllBorroweds() {
         return borrowedRepository.findAll();
     }
-
-
-
+    
 }
+

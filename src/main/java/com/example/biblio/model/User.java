@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.Set;
 
 @Data
-@NoArgsConstructor
 @Entity
+@NoArgsConstructor
 @Table(name = "users", uniqueConstraints = {
         @UniqueConstraint(columnNames = {
                 "username", "email"
