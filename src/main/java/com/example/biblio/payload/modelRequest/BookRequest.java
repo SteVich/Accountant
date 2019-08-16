@@ -4,13 +4,10 @@ import com.example.biblio.model.User;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
-import org.springframework.format.annotation.DateTimeFormat;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -21,9 +18,7 @@ public class BookRequest {
     String title;
 
     @NotNull
-    @Temporal(TemporalType.DATE)
-    @DateTimeFormat(pattern = "\"yyyy-MM-dd\"")
-    Date releaseTime;
+    LocalDate releaseTime;
 
     @NotNull
     User user;
