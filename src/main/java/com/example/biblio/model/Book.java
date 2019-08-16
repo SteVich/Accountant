@@ -1,9 +1,12 @@
 package com.example.biblio.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -31,7 +34,8 @@ public class Book {
     @Column(name = "releaseTime", nullable = false, length = 40)
     LocalDate releaseTime;
 
-    @OneToMany(mappedBy = "book")
+    @JsonBackReference
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "book")
     List<Borrowed> borroweds;
 
     Boolean access;

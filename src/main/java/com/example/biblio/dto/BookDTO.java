@@ -1,30 +1,24 @@
 package com.example.biblio.dto;
 
 import com.example.biblio.model.Borrowed;
-import com.example.biblio.model.Role;
-import com.example.biblio.payload.modelRequest.BookRequest;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserDTO {
+public class BookDTO {
 
     Long id;
 
-    String name;
+    String title;
 
-    String username;
-
-    String email;
-
-    Set<Role> roles;
-
-    List<BookRequest> books;
+    LocalDate releaseTime;
 
     List<Borrowed> borroweds;
+
+    Boolean access;
 
 }

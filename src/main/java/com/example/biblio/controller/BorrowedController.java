@@ -1,8 +1,9 @@
 package com.example.biblio.controller;
 
-import com.example.biblio.model.Borrowed;
+import com.example.biblio.dto.BorrowedDTO;
 import com.example.biblio.payload.ApiResponse;
 import com.example.biblio.service.BorrowedService;
+import com.example.biblio.transfer.BorrowedMapper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,17 +24,18 @@ import java.util.List;
 public class BorrowedController {
 
     BorrowedService borrowedService;
+    BorrowedMapper borrowedMapper;
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping
-    public ResponseEntity<List<Borrowed>> findAllBorroweds() {
-        return ResponseEntity.ok(borrowedService.findAllBorroweds());
+    public ResponseEntity<List<BorrowedDTO>> findAllBorroweds() {
+        return ResponseEntity.ok(borrowedMapper.toBorrowedDTOs(borrowedService.findAllBorroweds()));
     }
 
     @PreAuthorize("hasPermission(#id, 'Borrowed', 'READ')")
     @GetMapping("/{id}")
-    public ResponseEntity<Borrowed> findBorrowedById(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(borrowedService.findBorrowedById(id));
+    public ResponseEntity<BorrowedDTO> findBorrowedById(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(borrowedMapper.toBorrowedDTO(borrowedService.findBorrowedById(id)));
     }
 
     @PostMapping("/{bookId}")

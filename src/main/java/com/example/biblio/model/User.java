@@ -1,5 +1,6 @@
 package com.example.biblio.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -57,6 +58,7 @@ public class User {
     @Column(columnDefinition = "jsonb")
     Set<Role> roles = new HashSet<>();
 
+    @JsonBackReference
     @OneToMany(mappedBy = "user")
     List<Borrowed> borroweds;
 

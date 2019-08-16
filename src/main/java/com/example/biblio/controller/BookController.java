@@ -1,9 +1,11 @@
 package com.example.biblio.controller;
 
+import com.example.biblio.dto.BookDTO;
 import com.example.biblio.model.Book;
 import com.example.biblio.payload.ApiResponse;
 import com.example.biblio.payload.modelRequest.BookRequest;
 import com.example.biblio.service.BookService;
+import com.example.biblio.transfer.BookMapper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -27,6 +29,7 @@ import java.util.List;
 public class BookController {
 
     BookService bookService;
+    BookMapper bookMapper;
 
     @GetMapping
     public ResponseEntity<List<Book>> findAllBook() {
@@ -34,8 +37,8 @@ public class BookController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Book> findByBookId(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(bookService.findByBookId(id));
+    public ResponseEntity<BookDTO> findByBookId(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(bookMapper.toBookDTO(bookService.findByBookId(id)));
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
