@@ -2,12 +2,14 @@ package com.example.biblio.payload;
 
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+@ToString
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SignUpRequest {

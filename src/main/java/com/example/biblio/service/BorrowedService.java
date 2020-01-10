@@ -60,6 +60,12 @@ public class BorrowedService {
 
     @Transactional
     public void deleteBorrowed(Long id) {
+        Borrowed borrowed =  borrowedRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Borrowed", "id", id));
+
+        Book book = borrowed.getBook();
+        book.setAccess(false);
+        bookRepository.save(book);
+
         borrowedRepository.deleteById(id);
     }
 

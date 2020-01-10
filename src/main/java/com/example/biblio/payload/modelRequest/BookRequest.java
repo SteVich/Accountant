@@ -20,6 +20,4 @@ public class BookRequest {
     @NotNull
     LocalDate releaseTime;
 
-    @NotNull
-    User user;
 }
